@@ -4,6 +4,7 @@ import com.tiagorafaell.cifrascatolicas.application.auth.dto.AuthRequest;
 import com.tiagorafaell.cifrascatolicas.application.auth.dto.AuthResponse;
 import com.tiagorafaell.cifrascatolicas.application.auth.CadastrarUsuarioUseCase;
 import com.tiagorafaell.cifrascatolicas.application.auth.LoginUsuarioUseCase;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,11 +19,13 @@ public class AuthController {
         this.loginUsuario = loginUsuario;
     }
 
+    @Operation(summary = "Realiza o cadastro de usuário")
     @PostMapping("/register")
     public AuthResponse register(@RequestBody AuthRequest request) {
         return cadastrarUsuario.execute(request);
     }
 
+    @Operation(summary = "Realiza login do usuário")
     @PostMapping("/login")
     public AuthResponse login(@RequestBody AuthRequest request) {
         return loginUsuario.execute(request);
