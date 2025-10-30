@@ -2,17 +2,39 @@ name: CI - Build and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: cifrasdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
+
+      - name: Cache do Maven
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
 
       - name: Configurar JDK
         uses: actions/setup-java@v3
@@ -20,5 +42,5 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build com Maven
-        run: mvn clean install
+      - name: Esperar PostgreSQL iniciar
+        run: |
